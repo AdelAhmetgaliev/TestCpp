@@ -1,5 +1,7 @@
 # TestCpp
 
+[![CI](https://github.com/AdelAhmetgaliev/TestCpp/actions/workflows/ci.yml/badge.svg)](https://github.com/AdelAhmetgaliev/TestCpp/actions/workflows/ci.yml)
+
 A minimal, opinionated template for modern C++ projects: C++23, CMake ≥ 3.26
 with presets, strict warnings, security hardening, sanitizers, clang-tidy and
 clang-format wired in.
@@ -70,7 +72,7 @@ source/
 └── lib/        # library code (${ProjectName}::lib)
     ├── greeter.hpp
     └── greeter.cpp
-tests/         # Catch2 tests (${ProjectName}_tests, run via CTest)
+tests/          # Catch2 tests (${ProjectName}_tests, run via CTest)
 ```
 
 Quality-of-life targets are INTERFACE libraries attached to
