@@ -9,7 +9,7 @@ jobs:
   format-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install clang-format 19
         run: |
           sudo apt-get update
@@ -21,7 +21,7 @@ jobs:
   clang-tidy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install toolchain
         run: |
           sudo apt-get update
@@ -43,7 +43,7 @@ jobs:
           - gcc-sanitize
           - gcc-release
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install toolchain
         run: |
           sudo apt-get update
