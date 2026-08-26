@@ -1,0 +1,5 @@
+# Inherits every check from ../.clang-tidy, then relaxes the one check
+# that false-positives on Catch2's TEST_CASE macro expansion
+# (it generates a 'static' helper function).
+InheritParentConfig: true
+Checks: '-misc-use-anonymous-namespace'

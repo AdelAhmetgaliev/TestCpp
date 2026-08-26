@@ -1,0 +1,23 @@
+# Build (presets generate build/<presetName>)
+build/
+
+# Compilation artifacts outside build/
+*.o
+*.a
+*.so
+*.so.*
+*.exe
+
+# Temporary CMake check directories (try_compile, etc.)
+__cmake_systeminformation*/
+
+# clangd and other tools cache
+.cache/
+
+# Generated compile_commands.json (symlink to build/<preset>/...)
+compile_commands.json
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store

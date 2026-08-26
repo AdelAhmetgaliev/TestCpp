@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  format-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install clang-format 19
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format-19
+          sudo ln -sf "$(command -v clang-format-19)" /usr/local/bin/clang-format
+      - name: Check formatting
+        run: ./scripts/format.sh --check
+
+  clang-tidy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build clang-tidy-19
+          sudo ln -sf "$(command -v clang-tidy-19)" /usr/local/bin/clang-tidy
+      - name: Configure and build with clang-tidy
+        run: cmake --workflow --preset clang-tidy
+
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        preset:
+          - clang-debug
+          - clang-sanitize
+          - clang-release
+          - gcc-debug
+          - gcc-sanitize
+          - gcc-release
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build clang-19 g++-14
+          # Presets invoke plain clang++/g++; point them at the pinned versions.
+          sudo ln -sf "$(command -v clang++-19)" /usr/local/bin/clang++
+          sudo ln -sf "$(command -v clang-19)" /usr/local/bin/clang
+          sudo ln -sf "$(command -v g++-14)" /usr/local/bin/g++
+          sudo ln -sf "$(command -v gcc-14)" /usr/local/bin/gcc
+      - name: Configure, build and test (${{ matrix.preset }})
+        run: cmake --workflow --preset ${{ matrix.preset }}

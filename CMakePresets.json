@@ -1,0 +1,210 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "clang-base",
+      "hidden": true,
+      "inherits": "base",
+      "description": "Clang family — main development line",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "clang++"
+      }
+    },
+    {
+      "name": "clang-debug",
+      "inherits": "clang-base",
+      "displayName": "Clang Debug",
+      "description": "Main development line — debug build (Clang, Ninja)"
+    },
+    {
+      "name": "clang-tidy",
+      "inherits": "clang-debug",
+      "displayName": "Clang Debug + clang-tidy",
+      "description": "Main development line — debug build with clang-tidy during compilation",
+      "cacheVariables": {
+        "ENABLE_CLANG_TIDY": "ON"
+      }
+    },
+    {
+      "name": "clang-sanitize",
+      "inherits": "clang-debug",
+      "displayName": "Clang Debug + Sanitizers",
+      "description": "Main development line — debug build with ASan+UBSan (Clang, Ninja)",
+      "cacheVariables": {
+        "ENABLE_SANITIZERS": "ON"
+      }
+    },
+    {
+      "name": "clang-release",
+      "inherits": "clang-base",
+      "displayName": "Clang Release",
+      "description": "Main development line — release build (Clang, Ninja). -O3, LTO",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "gcc-base",
+      "hidden": true,
+      "inherits": "base",
+      "description": "GCC family — portability checking",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "g++"
+      }
+    },
+    {
+      "name": "gcc-debug",
+      "inherits": "gcc-base",
+      "displayName": "GCC Debug",
+      "description": "Portability checking — debug build (GCC, Ninja)"
+    },
+    {
+      "name": "gcc-sanitize",
+      "inherits": "gcc-debug",
+      "displayName": "GCC Debug + Sanitizers",
+      "description": "Debug build with ASan+UBSan (GCC, Ninja) — requires libasan",
+      "cacheVariables": {
+        "ENABLE_SANITIZERS": "ON"
+      }
+    },
+    {
+      "name": "gcc-release",
+      "inherits": "gcc-base",
+      "displayName": "GCC Release",
+      "description": "Portability checking — release build (GCC, Ninja). -O3, LTO",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "gcc-reldebinfo",
+      "inherits": "gcc-base",
+      "displayName": "GCC RelWithDebInfo",
+      "description": "Portability checking — release build with debug info (GCC, Ninja)",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "clang-debug", "configurePreset": "clang-debug" },
+    { "name": "clang-tidy", "configurePreset": "clang-tidy" },
+    { "name": "clang-sanitize", "configurePreset": "clang-sanitize" },
+    { "name": "clang-release", "configurePreset": "clang-release" },
+    { "name": "gcc-debug", "configurePreset": "gcc-debug" },
+    { "name": "gcc-sanitize", "configurePreset": "gcc-sanitize" },
+    { "name": "gcc-release", "configurePreset": "gcc-release" },
+    { "name": "gcc-reldebinfo", "configurePreset": "gcc-reldebinfo" }
+  ],
+  "testPresets": [
+    {
+      "name": "clang-debug",
+      "configurePreset": "clang-debug",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "clang-sanitize",
+      "configurePreset": "clang-sanitize",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "clang-release",
+      "configurePreset": "clang-release",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "gcc-debug",
+      "configurePreset": "gcc-debug",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "gcc-sanitize",
+      "configurePreset": "gcc-sanitize",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "gcc-release",
+      "configurePreset": "gcc-release",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "gcc-reldebinfo",
+      "configurePreset": "gcc-reldebinfo",
+      "output": { "outputOnFailure": true }
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "clang-debug",
+      "steps": [
+        { "type": "configure", "name": "clang-debug" },
+        { "type": "build", "name": "clang-debug" },
+        { "type": "test", "name": "clang-debug" }
+      ]
+    },
+    {
+      "name": "clang-tidy",
+      "steps": [
+        { "type": "configure", "name": "clang-tidy" },
+        { "type": "build", "name": "clang-tidy" }
+      ]
+    },
+    {
+      "name": "clang-sanitize",
+      "steps": [
+        { "type": "configure", "name": "clang-sanitize" },
+        { "type": "build", "name": "clang-sanitize" },
+        { "type": "test", "name": "clang-sanitize" }
+      ]
+    },
+    {
+      "name": "clang-release",
+      "steps": [
+        { "type": "configure", "name": "clang-release" },
+        { "type": "build", "name": "clang-release" },
+        { "type": "test", "name": "clang-release" }
+      ]
+    },
+    {
+      "name": "gcc-debug",
+      "steps": [
+        { "type": "configure", "name": "gcc-debug" },
+        { "type": "build", "name": "gcc-debug" },
+        { "type": "test", "name": "gcc-debug" }
+      ]
+    },
+    {
+      "name": "gcc-sanitize",
+      "steps": [
+        { "type": "configure", "name": "gcc-sanitize" },
+        { "type": "build", "name": "gcc-sanitize" },
+        { "type": "test", "name": "gcc-sanitize" }
+      ]
+    },
+    {
+      "name": "gcc-release",
+      "steps": [
+        { "type": "configure", "name": "gcc-release" },
+        { "type": "build", "name": "gcc-release" },
+        { "type": "test", "name": "gcc-release" }
+      ]
+    },
+    {
+      "name": "gcc-reldebinfo",
+      "steps": [
+        { "type": "configure", "name": "gcc-reldebinfo" },
+        { "type": "build", "name": "gcc-reldebinfo" },
+        { "type": "test", "name": "gcc-reldebinfo" }
+      ]
+    }
+  ]
+}
