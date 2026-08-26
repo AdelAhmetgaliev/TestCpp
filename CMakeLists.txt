@@ -52,6 +52,18 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Keep a compile_commands.json symlink at the source root for clangd;
+# regenerated on every configure, so it survives `rm -rf build`.
+# The last configured preset owns the link.
+if(CMAKE_EXPORT_COMPILE_COMMANDS AND NOT WIN32)
+    set(_compile_commands "${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json")
+    if(EXISTS "${_compile_commands}")
+        file(REMOVE "${_compile_commands}")
+    endif()
+    file(CREATE_LINK "${CMAKE_BINARY_DIR}/compile_commands.json"
+                     "${_compile_commands}" SYMBOLIC)
+endif()
+
 # ============================================================================
 # Compilation flags
 # ============================================================================
