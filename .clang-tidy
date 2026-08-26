@@ -34,8 +34,7 @@ Checks: >
   -bugprone-easily-swappable-parameters,
   -readability-magic-numbers,
   -readability-identifier-length,
-  -readability-function-cognitive-complexity,
-  -misc-include-cleaner
+  -readability-function-cognitive-complexity
 
 HeaderFilterRegex: 'source/.*|tests/.*'
 
