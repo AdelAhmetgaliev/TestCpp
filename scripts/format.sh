@@ -25,10 +25,13 @@ if ! command -v clang-format >/dev/null 2>&1; then
     exit 1
 fi
 
-# Prefer files tracked by git; fall back to find outside a work tree.
+# Inside a work tree: tracked files plus untracked-but-not-ignored ones
+# (so freshly created sources are formatted before their first `git add`);
+# outside a work tree fall back to find.
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     mapfile -d '' sources < <(
-        git ls-files -z -- '*.hpp' '*.cpp' ':!:third_party'
+        git ls-files -z --cached --others --exclude-standard \
+            -- '*.hpp' '*.cpp' ':(exclude)third_party/*'
     )
 else
     mapfile -d '' sources < <(

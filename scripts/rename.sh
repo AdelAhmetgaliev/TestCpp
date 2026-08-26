@@ -82,12 +82,14 @@ new_lower="$(sanitize_lower "$new_name")"
 
 cd "$root"
 
-# Collect text files to touch. rename.sh itself must never be rewritten.
+# Collect text files to touch: tracked plus untracked-but-not-ignored, so
+# freshly created sources are covered too. rename.sh itself must never be
+# rewritten.
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     mapfile -t files < <(
-        git ls-files \
+        git ls-files --cached --others --exclude-standard \
             -- '*.txt' '*.json' '*.jsonc' '*.md' '*.hpp' '*.cpp' \
-               ':(exclude)scripts/rename.sh'
+               ':(exclude)scripts/rename.sh' ':(exclude)third_party/*'
     )
 else
     mapfile -t files < <(
