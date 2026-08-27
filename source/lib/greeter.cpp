@@ -1,3 +1,5 @@
+/// Implementation of the greeter demo module.
+
 #include "greeter.hpp"
 
 #include <format>

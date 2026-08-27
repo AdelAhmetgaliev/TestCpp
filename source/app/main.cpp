@@ -1,3 +1,5 @@
+/// Application entry point: prints a greeting with the project version.
+
 #include <print>
 
 #include "greeter.hpp"
