@@ -5,12 +5,14 @@
 #include <string>
 #include <string_view>
 
-namespace testcpp {
+namespace testcpp
+{
 
 /// Builds a greeting message for the given name.
 ///
 /// \param name person or thing to greet
 /// \return "Hello, <name>!"
-[[nodiscard]] auto greet(std::string_view name) -> std::string;
+[[nodiscard]] auto
+greet(std::string_view name) -> std::string;
 
 } // namespace testcpp

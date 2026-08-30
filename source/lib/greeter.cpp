@@ -6,9 +6,14 @@
 #include <string>
 #include <string_view>
 
-namespace testcpp {
+namespace testcpp
+{
 
-auto greet(std::string_view name) -> std::string {
+auto
+greet(
+    std::string_view name
+) -> std::string
+{
     return std::format("Hello, {}!", name);
 }
 
