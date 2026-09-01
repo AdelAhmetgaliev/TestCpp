@@ -80,7 +80,7 @@ if(ENABLE_STRICT_WARNINGS)
         )
     else()
         target_compile_options(${PROJECT_NAME}_warnings INTERFACE
-            -Wall -Wextra -Wpedantic
+            -Wall -Wextra -Wpedantic -Werror
             -Wformat -Wformat=2
             -Wconversion
             -Wimplicit-fallthrough
@@ -193,18 +193,33 @@ if(ENABLE_CLANG_TIDY)
     find_program(CLANG_TIDY_EXECUTABLE NAMES clang-tidy clang-tidy-19
                  clang-tidy-18 clang-tidy-17 clang-tidy-16)
 
+    find_program(CLANG_TIDY_RUN NAMES run-clang-tidy run-clang-tidy-19
+                 run-clang-tidy-18 run-clang-tidy-17)
+
     if(CLANG_TIDY_EXECUTABLE)
         file(GLOB_RECURSE TIDY_SOURCES CONFIGURE_DEPENDS
              "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp"
              "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp")
 
-        add_custom_target(clang-tidy ALL
-            COMMAND ${CLANG_TIDY_EXECUTABLE}
-                    -p ${CMAKE_BINARY_DIR}
-                    ${TIDY_SOURCES}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            COMMENT "Run clang-tidy on the sources"
-        )
+        if(CLANG_TIDY_RUN)
+            add_custom_target(clang-tidy ALL
+                COMMAND ${CLANG_TIDY_RUN}
+                        -p ${CMAKE_BINARY_DIR}
+                        -quiet
+                        -j 4
+                        ${TIDY_SOURCES}
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                COMMENT "Running clang-tidy (parallel)"
+            )
+        else()
+            add_custom_target(clang-tidy ALL
+                COMMAND ${CLANG_TIDY_EXECUTABLE}
+                        -p ${CMAKE_BINARY_DIR}
+                        ${TIDY_SOURCES}
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                COMMENT "Running clang-tidy (sequential fallback)"
+            )
+        endif()
     else()
         message(WARNING "ENABLE_CLANG_TIDY=ON, but clang-tidy "
                         "was not found in PATH")
@@ -288,26 +303,27 @@ endif()
 # LTO
 # ============================================================================
 
+macro(testcpp_enable_lto target)
+    if(ENABLE_LTO AND ipo_supported)
+        set_property(TARGET ${target} PROPERTY
+            INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE
+        )
+        set_property(TARGET ${target} PROPERTY
+            INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO TRUE
+        )
+    endif()
+endmacro()
+
 if(ENABLE_LTO)
     include(CheckIPOSupported)
     check_ipo_supported(RESULT ipo_supported OUTPUT ipo_output LANGUAGES CXX)
 
     if(ipo_supported)
-        # Every consumer of the LTO'd static library must itself link with
-        # LTO, otherwise the linker cannot resolve symbols from bitcode.
-        set(ipo_targets ${PROJECT_NAME}_lib ${PROJECT_NAME}_exe)
+        testcpp_enable_lto(${PROJECT_NAME}_lib)
+        testcpp_enable_lto(${PROJECT_NAME}_exe)
         if(TARGET ${PROJECT_NAME}_tests)
-            list(APPEND ipo_targets ${PROJECT_NAME}_tests)
+            testcpp_enable_lto(${PROJECT_NAME}_tests)
         endif()
-
-        foreach(tgt IN LISTS ipo_targets)
-            set_property(TARGET ${tgt} PROPERTY
-                INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE
-            )
-            set_property(TARGET ${tgt} PROPERTY
-                INTERPROCEDURAL_OPTIMIZATION_RELWITHDEBINFO TRUE
-            )
-        endforeach()
     else()
         message(WARNING "LTO not supported: ${ipo_output}")
     endif()
