@@ -48,7 +48,7 @@ cmake --workflow --preset <name>
 | Option             | Default | Description                     |
 | ------------------ | ------- | ------------------------------- |
 | `ENABLE_LTO`       | `ON`    | Link Time Optimization (Release/RelWithDebInfo) |
-| `ENABLE_STRICT_WARNINGS` | `ON` | Strict warning set (`-Wall -Wextra -Wpedantic -Wconversion -Wshadow …`, MSVC `/W4 /WX`) |
+| `ENABLE_STRICT_WARNINGS` | `ON` | Strict warning set (`-Wall -Wextra -Wpedantic -Werror -Wconversion -Wshadow …`, MSVC `/W4 /WX`) |
 | `ENABLE_SANITIZERS` | `OFF`  | ASan + UBSan (with `-fno-sanitize-recover=undefined`) |
 | `ENABLE_CLANG_TIDY` | `OFF`  | clang-tidy custom target run on every build |
 | `ENABLE_TESTS`      | `ON`   | Build tests (Catch2 v3 via FetchContent) and register them with CTest |
@@ -67,18 +67,47 @@ found. Set `ENABLE_TESTS=OFF` for a fully offline, dependency-free build.
 
 ```
 source/
-├── app/        # executables (thin entry points)
-│   └── main.cpp
-└── lib/        # library code (${ProjectName}::lib)
-    ├── greeter.hpp
-    └── greeter.cpp
-tests/          # Catch2 tests (${ProjectName}_tests, run via CTest)
+  app/
+    main.cpp              # entry point (thin wrapper)
+    cli/
+      cli.hpp             # CLI config, CliError, parse(), run()
+      cli.cpp             # CLI implementation
+  lib/
+    greeter/
+      greeter.hpp         # library public header
+      greeter.cpp         # library implementation
+tests/
+  greeter.test.cpp        # greeter unit tests
+  cli.test.cpp            # CLI unit tests
+scripts/
+  format.sh               # clang-format wrapper
+  rename.sh               # project renamer
 ```
 
 Quality-of-life targets are INTERFACE libraries attached to
 `${ProjectName}::lib` and inherited by consumers:
 `${ProjectName}::warnings`, `${ProjectName}::hardening`,
 `${ProjectName}::sanitizers`.
+
+## CLI
+
+The template includes a demo CLI module demonstrating safe command-line
+argument handling with `std::expected`, `CliError`, and `std::span`:
+
+```sh
+./build/clang-debug/bin/TestCpp_exe                     # Hello, World!
+./build/clang-debug/bin/TestCpp_exe Alice Bob           # Hello, Alice! / Hello, Bob!
+./build/clang-debug/bin/TestCpp_exe --uppercase World   # HELLO, WORLD!
+./build/clang-debug/bin/TestCpp_exe --help              # Usage information
+./build/clang-debug/bin/TestCpp_exe --version           # TestCpp v0.1.0
+```
+
+Architecture:
+- `cli::parse(std::span<const std::string_view>)` — returns
+  `std::expected<Config, CliError>`
+- `cli::run(const Config&)` — executes logic, returns exit code
+- Raw `argv` handling is isolated in `main()` with a single `NOLINT`
+- All other code is pointer-free and lint-clean
 
 ## Formatting and linting
 
