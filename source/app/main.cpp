@@ -1,11 +1,32 @@
-/// Application entry point: prints a greeting with the project version.
+/// Application entry point.
 
+#include <cstddef>
+#include <cstdlib>
 #include <print>
+#include <span>
+#include <string_view>
+#include <vector>
 
-#include "greeter.hpp"
+#include "cli.hpp"
 
 auto
-main() -> int
+main(
+    int argc,
+    char *argv[]
+) -> int
 {
-    std::println("{} (v{})", testcpp::greet("World"), PROJECT_VERSION);
+    const auto raw = std::span{argv, static_cast<std::size_t>(argc)};
+    const auto args = std::vector<std::string_view>{raw.begin(), raw.end()};
+
+    const auto config = testcpp::cli::parse(args);
+    if (!config)
+    {
+        std::println(
+            stderr, "{}\nUse --help for usage.",
+            testcpp::cli::format_error(config.error())
+        );
+        return EXIT_FAILURE;
+    }
+
+    return testcpp::cli::run(*config);
 }

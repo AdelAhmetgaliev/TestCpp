@@ -254,6 +254,22 @@ if(TARGET ${PROJECT_NAME}::sanitizers)
 endif()
 
 # ============================================================================
+# CLI module (shared between exe and tests)
+# ============================================================================
+
+add_library(${PROJECT_NAME}_cli OBJECT
+    source/app/cli/cli.cpp
+)
+
+target_include_directories(${PROJECT_NAME}_cli PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/source/app/cli
+)
+
+target_link_libraries(${PROJECT_NAME}_cli PUBLIC
+    ${PROJECT_NAME}::lib
+)
+
+# ============================================================================
 # Main executable
 # ============================================================================
 
@@ -266,7 +282,7 @@ target_compile_definitions(${PROJECT_NAME}_exe PRIVATE
 )
 
 target_link_libraries(${PROJECT_NAME}_exe PRIVATE
-    ${PROJECT_NAME}::lib
+    ${PROJECT_NAME}_cli
 )
 
 # ============================================================================
@@ -289,10 +305,11 @@ if(ENABLE_TESTS)
 
     add_executable(${PROJECT_NAME}_tests
         tests/greeter.test.cpp
+        tests/cli.test.cpp
     )
 
     target_link_libraries(${PROJECT_NAME}_tests PRIVATE
-        ${PROJECT_NAME}::lib
+        ${PROJECT_NAME}_cli
         Catch2::Catch2WithMain
     )
 
