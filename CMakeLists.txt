@@ -201,31 +201,11 @@ if(ENABLE_CLANG_TIDY)
              "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp"
              "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp")
 
-        # Extract version from clang-tidy path (e.g. clang-tidy-19 -> 19)
-        string(REGEX MATCH "clang-tidy-([0-9]+)$" _match "${CLANG_TIDY_EXECUTABLE}")
-        set(_tidy_ver "${CMAKE_MATCH_1}")
-
-        # Extract version from run-clang-tidy path (e.g. run-clang-tidy-19 -> 19)
-        set(_run_ver "")
         if(CLANG_TIDY_RUN)
-            string(REGEX MATCH "run-clang-tidy-([0-9]+)$" _match "${CLANG_TIDY_RUN}")
-            set(_run_ver "${CMAKE_MATCH_1}")
-        endif()
-
-        # Use parallel only when versions match or both unversioned
-        set(_use_parallel FALSE)
-        if(CLANG_TIDY_RUN)
-            if(_tidy_ver STREQUAL _run_ver)
-                set(_use_parallel TRUE)
-            elseif(_tidy_ver STREQUAL "" AND _run_ver STREQUAL "")
-                set(_use_parallel TRUE)
-            endif()
-        endif()
-
-        if(_use_parallel)
             add_custom_target(clang-tidy ALL
                 COMMAND ${CLANG_TIDY_RUN}
                         -p ${CMAKE_BINARY_DIR}
+                        -clang-tidy-binary ${CLANG_TIDY_EXECUTABLE}
                         -quiet
                         -j 4
                         ${TIDY_SOURCES}
