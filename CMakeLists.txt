@@ -190,11 +190,11 @@ endif()
 # ============================================================================
 
 if(ENABLE_CLANG_TIDY)
-    find_program(CLANG_TIDY_EXECUTABLE NAMES clang-tidy clang-tidy-19
-                 clang-tidy-18 clang-tidy-17 clang-tidy-16)
+    find_program(CLANG_TIDY_EXECUTABLE NAMES clang-tidy-19 clang-tidy-18
+                 clang-tidy-17 clang-tidy-16 clang-tidy)
 
-    find_program(CLANG_TIDY_RUN NAMES run-clang-tidy run-clang-tidy-19
-                 run-clang-tidy-18 run-clang-tidy-17)
+    find_program(CLANG_TIDY_RUN NAMES run-clang-tidy-19 run-clang-tidy-18
+                 run-clang-tidy-17 run-clang-tidy)
 
     if(CLANG_TIDY_EXECUTABLE)
         file(GLOB_RECURSE TIDY_SOURCES CONFIGURE_DEPENDS
