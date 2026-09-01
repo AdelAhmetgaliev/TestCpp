@@ -231,12 +231,12 @@ endif()
 # ============================================================================
 
 add_library(${PROJECT_NAME}_lib STATIC
-    source/lib/greeter.cpp
+    source/lib/greeter/greeter.cpp
 )
 add_library(${PROJECT_NAME}::lib ALIAS ${PROJECT_NAME}_lib)
 
 target_include_directories(${PROJECT_NAME}_lib PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/source/lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/source/lib/greeter
 )
 
 target_compile_definitions(${PROJECT_NAME}_lib PUBLIC
