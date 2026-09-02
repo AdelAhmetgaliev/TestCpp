@@ -1,11 +1,6 @@
 /// Application entry point.
 
-#include <cstddef>
-#include <cstdlib>
-#include <print>
-#include <span>
-#include <string_view>
-#include <vector>
+#include "main.hpp"
 
 #include "cli.hpp"
 
